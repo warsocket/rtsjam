@@ -24,34 +24,46 @@
 #include <netpacket/packet.h>
 #include <netinet/in.h>
 
+void status(const char* message)
+{
+    printf("%s:  %s (%d)\n", message, strerror(errno), errno);
+    if (errno) exit(1);
+}
+
 int main(int argc, char* argv[])
 {
-    int sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    if (argc < 2)
+    {
+        printf("%s", "Specify a monitor mode interface as parameter #1\n");
+        exit(1);
+    }
 
-    struct ifreq ifr; 
+    int sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    status("create socket");
+
+    struct ifreq ifr;
     memcpy(ifr.ifr_name, argv[1], 16);
+
     ioctl(sockfd, SIOCGIFINDEX, &ifr);
+    status("get interface");
 
     struct sockaddr_ll sa;
     sa.sll_family = AF_PACKET;
     sa.sll_ifindex = ifr.ifr_ifindex;
 
     bind(sockfd, (const struct sockaddr *)&sa, sizeof(sa));
+    status("bind socket");
+
 
     char pkt[] = {0,0,8,0,0,0,0,0, 0xb4,0,0xff,0x7f, 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF, 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
-    printf("%s (%d)\n",strerror(errno), errno);
-    if (errno){exit(1);}
-
+    printf("%s", "starting operation...\n");
+    fflush(stdout);
 
     while(1)
     {
         send(sockfd, &pkt, sizeof(pkt), 0x0);
         sleep(0);
     }
-
-    
-
-
 
 }
