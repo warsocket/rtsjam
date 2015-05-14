@@ -1,6 +1,7 @@
-// wifi channel jammer using RST
-
 /*
+    Jamming the current wifi channel using Request To Send frames
+    Copyright (C) 2015  Bram Staps
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
